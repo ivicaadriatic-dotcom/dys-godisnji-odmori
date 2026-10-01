@@ -1,5 +1,5 @@
-// DYS Godišnji odmori — service worker V.1.1.0
-const C='dys-go-1.1.0';
+// DYS Godišnji odmori — service worker V.1.1.1
+const C='dys-go-1.1.1';
 const FILES=['./','index.html','manifest.json'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(FILES)));self.skipWaiting();});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))));self.clients.claim();});

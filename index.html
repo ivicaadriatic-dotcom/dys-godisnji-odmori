@@ -288,7 +288,10 @@ table.t tfoot td{font-weight:800;border-top:1px solid var(--bord2)}
  #tb{padding:12px 14px 10px;padding-top:max(12px,env(safe-area-inset-top))}
  #tbTitle{font-size:18px}
  .hide-sm{display:none}
- .mlogo{display:block;line-height:0;margin-bottom:4px}.mlogo svg,.mlogo img{height:32px;width:auto;max-width:150px}html[data-theme=dark] .mlogo span{background:#fff;border-radius:7px;padding:3px 6px;display:inline-block}.crumb{display:none}
+ .mlogo{display:block;line-height:0;margin-bottom:4px;max-width:100%}.mlogo span{display:inline-block;max-width:100%;line-height:0}.mlogo svg,.mlogo img{display:block;width:100%;max-width:132px;height:auto}html[data-theme=dark] .mlogo span{background:#fff;border-radius:7px;padding:4px 6px}.crumb{display:none}
+ #thBtn{display:none}
+ .tb-t{overflow:hidden}
+ .tb-r{gap:6px;flex-shrink:0}
  .btn.pri.newb{width:36px;padding:0;justify-content:center}
  #content{padding:14px 14px calc(var(--tabh) + 24px + env(safe-area-inset-bottom))}
  #tabs{display:flex;position:fixed;left:0;right:0;bottom:0;height:calc(var(--tabh) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:var(--glass);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-top:1px solid var(--bord);z-index:50}
@@ -419,7 +422,7 @@ table.t tfoot td{font-weight:800;border-top:1px solid var(--bord2)}
 <script>
 'use strict';
 const PRISTINE='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
-const APP_VERSION='1.1.0',APP_DATE='01.10.2026.';const VLBL='V.'+APP_VERSION;
+const APP_VERSION='1.1.1',APP_DATE='01.10.2026.';const VLBL='V.'+APP_VERSION;
 const LS='dysgo_v2';
 const BRAND_SVG=document.getElementById('brandLogo').innerHTML.trim();
 /* ───────── Utils ───────── */
@@ -958,7 +961,7 @@ function vSet(c){
   <div class="hint" style="margin-top:12px">PIN se pamti kao zaštićeni zapis (SHA-256) i putuje zajedno s datotekom kad je spremite na računalo. Štiti od neovlaštenog pogleda na uređaju, ali nije zaštita na razini poslužitelja.</div></div>
  <div class="card mb"><div class="card-h"><div><div class="card-t">O aplikaciji</div><div class="card-s">DYS Godišnji odmori</div></div><span class="vtag" style="font-size:12px">${VLBL}</span></div>
   <div class="li"><div class="li-b"><div class="li-n">Verzija</div><div class="li-s">${VLBL} · ${APP_DATE}</div></div></div>
-  <div class="li"><div class="li-b"><div class="li-n">Novo u verziji</div><div class="li-s"><b>V.1.1.0</b> — sinkronizacija PC ↔ mobitel preko Supabasea, zajednički PIN na svim uređajima. <b>V.1.0.0</b> — redizajn u HACCP stilu, logo dotyourspot., navy tamna tema, prijava PIN-om, mobilna verzija, unos za iduće godine, kronološki redoslijed odluka</div></div></div></div>
+  <div class="li"><div class="li-b"><div class="li-n">Novo u verziji</div><div class="li-s"><b>V.1.1.1</b> — ispravak loga u gornjoj traci na mobitelu. <b>V.1.1.0</b> — sinkronizacija PC ↔ mobitel preko Supabasea, zajednički PIN na svim uređajima. <b>V.1.0.0</b> — redizajn u HACCP stilu, logo dotyourspot., navy tamna tema, prijava PIN-om, mobilna verzija, unos za iduće godine, kronološki redoslijed odluka</div></div></div></div>
  <div class="card mb"><div class="card-h"><div><div class="card-t">Podaci i sigurnosna kopija</div><div class="card-s">${D.emps.length} djelatnika · ${allDecs().length} odluka</div></div><div class="sq red">${ic('db')}</div></div>
   <div class="row-btns"><button class="btn grn" onclick="saveAppToPC()">${ic('save')}Spremi aplikaciju na računalo</button><button class="btn" onclick="exportJSON()">${ic('down')}Izvoz JSON</button><button class="btn" onclick="importJSON()">${ic('up')}Uvoz JSON</button></div>
   <div class="hint" style="margin-top:12px">„Spremi na računalo“ (Chrome/Edge) povezuje HTML datoteku i nakon toga svaku promjenu automatski upisuje u nju — podaci putuju zajedno s datotekom. Na mobitelu se datoteka preuzima.</div>
