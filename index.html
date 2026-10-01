@@ -277,6 +277,7 @@ table.t tfoot td{font-weight:800;border-top:1px solid var(--bord2)}
 .lk-pad svg{width:24px;height:24px}
 .lk-f{margin-top:26px;font-size:11.5px;color:#7f92ad}
 @media (max-height:640px){.lk-pad{grid-template-columns:repeat(3,60px);gap:10px}.lk-pad button{width:60px;height:60px;font-size:22px}.lk-logo{margin-bottom:14px}}
+#updBar{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top));transform:translateX(-50%);z-index:1500;display:flex;align-items:center;gap:12px;background:#0741ad;color:#fff;padding:10px 12px 10px 16px;border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.4);font-size:13px;max-width:calc(100vw - 24px)}#updBar button{border:0;background:#d8de7e;color:#0f1e35;font-weight:800;padding:7px 14px;border-radius:10px;font-size:13px}
 /* bottom tabs */
 #tabs{display:none}
 @media (max-width:1200px){.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.ycal{grid-template-columns:repeat(3,minmax(0,1fr))}.g32{grid-template-columns:1fr}}
@@ -422,7 +423,7 @@ table.t tfoot td{font-weight:800;border-top:1px solid var(--bord2)}
 <script>
 'use strict';
 const PRISTINE='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
-const APP_VERSION='1.1.1',APP_DATE='01.10.2026.';const VLBL='V.'+APP_VERSION;
+const APP_VERSION='1.1.2',APP_DATE='01.10.2026.';const VLBL='V.'+APP_VERSION;
 const LS='dysgo_v2';
 const BRAND_SVG=document.getElementById('brandLogo').innerHTML.trim();
 /* ───────── Utils ───────── */
@@ -960,8 +961,8 @@ function vSet(c){
   <div class="fgrid"><div class="fg"><label>Automatska odjava nakon (min)</label><input class="inp" type="number" min="1" max="240" value="${s.lockMin}" onchange="D.settings.lockMin=Math.max(1,+this.value||15);save();toast('Spremljeno','g')"></div><div class="fg"><label>&nbsp;</label><div class="row-btns"><button class="btn" onclick="changePin()">${ic('lock')}Promijeni PIN</button><button class="btn" onclick="lockApp()">Odjava</button></div></div></div>
   <div class="hint" style="margin-top:12px">PIN se pamti kao zaštićeni zapis (SHA-256) i putuje zajedno s datotekom kad je spremite na računalo. Štiti od neovlaštenog pogleda na uređaju, ali nije zaštita na razini poslužitelja.</div></div>
  <div class="card mb"><div class="card-h"><div><div class="card-t">O aplikaciji</div><div class="card-s">DYS Godišnji odmori</div></div><span class="vtag" style="font-size:12px">${VLBL}</span></div>
-  <div class="li"><div class="li-b"><div class="li-n">Verzija</div><div class="li-s">${VLBL} · ${APP_DATE}</div></div></div>
-  <div class="li"><div class="li-b"><div class="li-n">Novo u verziji</div><div class="li-s"><b>V.1.1.1</b> — ispravak loga u gornjoj traci na mobitelu. <b>V.1.1.0</b> — sinkronizacija PC ↔ mobitel preko Supabasea, zajednički PIN na svim uređajima. <b>V.1.0.0</b> — redizajn u HACCP stilu, logo dotyourspot., navy tamna tema, prijava PIN-om, mobilna verzija, unos za iduće godine, kronološki redoslijed odluka</div></div></div></div>
+  <div class="li"><div class="li-b"><div class="li-n">Verzija</div><div class="li-s">${VLBL} · ${APP_DATE}</div></div>${/^https?:/.test(location.protocol)?`<button class="btn sm" onclick="checkUpdate(true)">Provjeri ažuriranje</button>`:''}</div>
+  <div class="li"><div class="li-b"><div class="li-n">Novo u verziji</div><div class="li-s"><b>V.1.1.2</b> — automatska obavijest o novoj verziji i gumb „Ažuriraj“. <b>V.1.1.1</b> — ispravak loga u gornjoj traci na mobitelu. <b>V.1.1.0</b> — sinkronizacija PC ↔ mobitel preko Supabasea, zajednički PIN na svim uređajima. <b>V.1.0.0</b> — redizajn u HACCP stilu, logo dotyourspot., navy tamna tema, prijava PIN-om, mobilna verzija, unos za iduće godine, kronološki redoslijed odluka</div></div></div></div>
  <div class="card mb"><div class="card-h"><div><div class="card-t">Podaci i sigurnosna kopija</div><div class="card-s">${D.emps.length} djelatnika · ${allDecs().length} odluka</div></div><div class="sq red">${ic('db')}</div></div>
   <div class="row-btns"><button class="btn grn" onclick="saveAppToPC()">${ic('save')}Spremi aplikaciju na računalo</button><button class="btn" onclick="exportJSON()">${ic('down')}Izvoz JSON</button><button class="btn" onclick="importJSON()">${ic('up')}Uvoz JSON</button></div>
   <div class="hint" style="margin-top:12px">„Spremi na računalo“ (Chrome/Edge) povezuje HTML datoteku i nakon toga svaku promjenu automatski upisuje u nju — podaci putuju zajedno s datotekom. Na mobitelu se datoteka preuzima.</div>
@@ -1055,6 +1056,19 @@ addEventListener('online',()=>syncSoon(500));
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')syncSoon(200);});
 setInterval(()=>{if(SY.on&&document.visibilityState==='visible')syncNow(true);},60000);
 
+
+/* ───────── Provjera nove verzije ───────── */
+let _updShown=false;
+async function checkUpdate(manual){
+ if(!/^https?:/.test(location.protocol))return;
+ try{const r=await fetch('./index.html?vc='+Date.now(),{cache:'no-store'});if(!r.ok)return;const s=await r.text();const m=s.match(/APP_VERSION='([0-9.]+)'/);
+  if(m&&m[1]!==APP_VERSION){showUpd(m[1]);}else if(manual)toast('Imate najnoviju verziju '+VLBL,'g');}catch(x){}
+}
+function showUpd(v){if(_updShown)return;_updShown=true;const b=document.createElement('div');b.id='updBar';b.innerHTML=`<span>Dostupna je nova verzija <b>V.${esc(v)}</b></span><button onclick="doUpdate()">Ažuriraj</button>`;document.body.appendChild(b);}
+async function doUpdate(){try{if(navigator.serviceWorker){const rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(r=>r.update().catch(()=>{})));}if(window.caches){const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)));}}catch(x){}location.replace(location.pathname+'?v='+Date.now());}
+setTimeout(()=>checkUpdate(),4000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate();});
+setInterval(()=>checkUpdate(),30*60000);
 /* ───────── Prijava (PIN) ───────── */
 function sha256(s){const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
  const b=new TextEncoder().encode(s),l=b.length,n=((l+9+63)>>6)<<6,m=new Uint8Array(n);m.set(b);m[l]=0x80;const bl=l*8;for(let i=0;i<4;i++)m[n-1-i]=(bl>>>(8*i))&255;
