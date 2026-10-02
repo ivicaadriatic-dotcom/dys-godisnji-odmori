@@ -1,16 +1,16 @@
 {
-  "id": "/dys-godisnji-odmori/",
+  "id": "/dys-godisnji-odmori/?app=dys-go",
   "name": "DYS Godišnji odmori",
   "short_name": "DYS G.O.",
   "description": "Evidencija godišnjih odmora — DOT YOUR SPOT d.o.o.",
   "lang": "hr",
-  "start_url": "/dys-godisnji-odmori/",
+  "start_url": "/dys-godisnji-odmori/?app=dys-go",
   "scope": "/dys-godisnji-odmori/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0f1e35",
   "theme_color": "#0f1e35",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "icons": [
     {
       "src": "icon-192.png",
